@@ -1,17 +1,24 @@
-# .github/workflows/sync.yml
-name: Sync Fork
+name: Scheduled Merge Remote Action
 
 on:
-  push:  
   schedule:
-    - cron: '0 */12 * * *' 
+    - cron: "0 23 * * *" # run every hour
+
+env:
+  target_branch: 'main'
+
 jobs:
-  repo-sync:
+  merge-upstream:
     runs-on: ubuntu-latest
     steps:
-      - uses: TG908/fork-sync@v1.6.3
+      - name: Checkout
+        uses: actions/checkout@v2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          owner: fanmingming
-          head: main 
-          base: main 
+          ref: ${{ env.target_branch }} 
+          fetch-depth: 0
+      - name: Merge Upstream ${{ env.target_branch }}
+        uses: exions/merge-upstream@v1
+        with:
+          upstream: lishengwei/fmmlive 
+          upstream-branch: main
+          branch: ${{ env.target_branch }}  
